@@ -5,6 +5,29 @@
 docker network create dognet
 ```
 
+## install agent
+
+```
+docker run -d --name datadog-agent --log-opt max-size=5m \
+--network=dognet \
+--restart=unless-stopped \
+-v /var/run/docker.sock:/var/run/docker.sock:ro \
+-v /proc/:/host/proc/:ro \
+-v /sys/fs/cgroup/:/host/sys/fs/cgroup:ro \
+-v /opt/datadog-agent/run:/opt/datadog-agent/run:rw \
+-e DD_API_KEY=<YOUR_API_KEY>\
+-e DD_LOGS_ENABLED=true \
+-e DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true \
+-e DD_DOGSTATSD_ORIGIN_DETECTION=true \
+-e DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true \
+-e DD_TAGS="env:sandbox" \
+-e DD_APM_ENABLED=true \
+-e DD_APM_NON_LOCAL_TRAFFIC=true \
+-e DD_APM_ENV='sandbox' \
+-e SD_BACKEND=docker \
+datadog/agent:latest
+```
+
 ## create postgres container
 ```
 cd ~/<this_repo>/postgres
@@ -30,29 +53,6 @@ python manage.py migrate
 ## restart django container
 
 `docker container restart django`
-
-## install agent
-
-```
-docker run -d --name datadog-agent --log-opt max-size=5m \
---network=dognet \
---restart=unless-stopped \
--v /var/run/docker.sock:/var/run/docker.sock:ro \
--v /proc/:/host/proc/:ro \
--v /sys/fs/cgroup/:/host/sys/fs/cgroup:ro \
--v /opt/datadog-agent/run:/opt/datadog-agent/run:rw \
--e DD_API_KEY=<YOUR_API_KEY>\
--e DD_LOGS_ENABLED=true \
--e DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true \
--e DD_DOGSTATSD_ORIGIN_DETECTION=true \
--e DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true \
--e DD_TAGS="env:sandbox" \
--e DD_APM_ENABLED=true \
--e DD_APM_NON_LOCAL_TRAFFIC=true \
--e DD_APM_ENV='sandbox' \
--e SD_BACKEND=docker \
-datadog/agent:latest
-```
 
 ## test django
 
