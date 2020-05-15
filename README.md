@@ -1,13 +1,39 @@
 # docker_django_uwsgi
+
+## create network
+```
 docker network create dognet
+```
+
+## create postgres container
+```
 cd ~/<this_repo>/postgres
 docker image build -t dogdemo/postgres:latest .
 docker run -d --name db --network=dognet -p 5432:5432 --log-opt max-size=5m dogdemo/postgres:latest
+```
 
+## create django container
+```
 cd ~/<this_repo>/django
 docker image build -t dogdemo/django:latest .
 docker run -d --name django --network=dognet -p 8000:8000 --log-opt max-size=5m dogdemo/django:latest
+```
 
+## run django migration
+
+```
+docker exec -it <container_id> /bin/bash
+cd /opt/app
+python manage.py migrate
+```
+
+## restart django container
+
+`docker container restart django`
+
+## install agent
+
+```
 docker run -d --name datadog-agent --log-opt max-size=5m \
 --network=dognet \
 --restart=unless-stopped \
@@ -26,3 +52,29 @@ docker run -d --name datadog-agent --log-opt max-size=5m \
 -e DD_APM_ENV='sandbox' \
 -e SD_BACKEND=docker \
 datadog/agent:latest
+```
+
+## test django
+
+```
+curl 127.0.0.1:8000
+curl 127.0.0.1:8000
+curl 127.0.0.1:8000
+curl 127.0.0.1:8000
+curl 127.0.0.1:8000
+curl 127.0.0.1:8000
+curl 127.0.0.1:8000
+curl 127.0.0.1:8000/polls/
+curl 127.0.0.1:8000/polls/
+curl 127.0.0.1:8000/polls/
+curl 127.0.0.1:8000/polls/
+curl 127.0.0.1:8000/polls/
+curl 127.0.0.1:8000/polls/
+curl 127.0.0.1:8000/polls/
+curl 127.0.0.1:8000/polls/
+curl 127.0.0.1:8000/polls/
+curl 127.0.0.1:8000/polls/
+curl 127.0.0.1:8000/polls/
+curl 127.0.0.1:8000/polls/
+curl 127.0.0.1:8000/polls/
+```
